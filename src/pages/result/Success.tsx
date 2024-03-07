@@ -22,7 +22,11 @@ const Done = () => {
       </div>
       <div className="h-50  rounded-lg  text-green-500  text-center">
         <div className="bg-green-100 p-2 rounded-lg">
-          คุณได้ลงทะเบียนไปแล้วกรุณารอการยืนยืนจากระบบ
+          <p>
+            คุณได้ลงทะเบียนเสร็จสิ้น
+            <br />
+            กรุณารอการยืนยันผลการลงทะเบียนในอีเมล
+          </p>
         </div>
       </div>
     </div>

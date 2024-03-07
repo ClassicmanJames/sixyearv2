@@ -20,6 +20,7 @@ import {
 } from "react-hook-form";
 type FormValues = {
   idcard: string;
+  email: string;
 };
 export default function Home() {
   const [popUp, setPopup] = useState<boolean>(false);
@@ -53,6 +54,7 @@ export default function Home() {
     let datasent = {
       fname: fname,
       lname: lname,
+      type_p: 3,
     };
     console.log(datasent);
     const response = await axios.post(
@@ -80,11 +82,11 @@ export default function Home() {
     setDisableBtnsub(true);
     dispath(Setting.updateState({ isLoadingScreen: true }));
     let datasent = {
-      cit_id: data.idcard,
+      email: data.email,
     };
     //console.log(datasent);
     const response = await axios.post(
-      process.env.NEXT_PUBLIC_CMU_SERVICE + `/ss`,
+      process.env.NEXT_PUBLIC_CMU_SERVICE + `/check_alumni/` + data.idcard,
       datasent,
       {
         headers: {
@@ -92,11 +94,14 @@ export default function Home() {
         },
       }
     );
-    console.log(response);
+    //console.log(response);
     if (response.data.status === 1) {
       //console.log(response.data.msg);
       router.push("/result/Done");
-    } else {
+    } else if (response.data.status === 42) {
+      dispath(Setting.updateState({ isLoadingScreen: true }));
+      router.push("/result/Serverfull");
+    } else if (response.data.status === 43) {
       //console.log(response.data.msg);
       router.push("/result/Success");
     }
@@ -258,13 +263,32 @@ export default function Home() {
           <div className="h-50  rounded-lg ">
             <div className=" m-5 h-50 rounded-lg ">
               <span className="text-slate-900 text-sm font-medium">
-                เลขบัตรประชชาชน
+                เลขบัตรประชาชน
               </span>
               <input
-                {...register("agedata", { required: true })}
+                {...register("idcard", { required: true })}
                 type={"number"}
                 className={`border-2 text-gray-900 text-md rounded-lg  block w-full p-2.5 ${
-                  errors.phone ? "border-rose-500" : "border-gary-500"
+                  errors.idcard ? "border-rose-500" : "border-gary-500"
+                }
+              `}
+              />
+            </div>
+          </div>
+          <div className="h-50  rounded-lg ">
+            <div className=" m-5 h-50 rounded-lg ">
+              <span className="text-slate-900 text-sm font-medium">อีเมล</span>
+              <input
+                {...register("email", {
+                  required: true,
+                  pattern: {
+                    value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                    message: "Invalid email address",
+                  },
+                })}
+                type={"text"}
+                className={`border-2 text-gray-900 text-md rounded-lg  block w-full p-2.5 ${
+                  errors.email ? "border-rose-500" : "border-gary-500"
                 }
               `}
               />
@@ -287,9 +311,9 @@ export default function Home() {
 
             <button
               disabled={disableBtn}
-              onClick={() => {
-                setPopup(true);
-              }}
+              // onClick={() => {
+              //   setPopup(true);
+              // }}
               className={`bg-ccmu text-white py-3 w-full rounded-xl   ${
                 disableBtn ? "bg-gray-300 " : "bg-ccmu   "
               }`}
@@ -345,12 +369,15 @@ export default function Home() {
 
                       <div className="mt-4">
                         <button
+                          type="submit"
                           disabled={disableBtnsub}
                           className={`text-white p-2 rounded-lg cursor-pointer w-full mt-2   ${
                             disableBtnsub ? "bg-gray-300 " : "bg-green-500  "
                           }`}
                           //   className="bg-green-500 text-white p-2 rounded-lg cursor-pointer w-full mt-2"
-                          onClick={setDataUserTracking}
+                          onClick={() => {
+                            setPopup(true);
+                          }}
                         >
                           ยืนยัน
                         </button>
